@@ -60,6 +60,8 @@ def main():
 
     # Check if datasets exist first
     download_utils.check_libero_dataset(download_dir=args.download_dir)
+    
+    print(f"save dataset in {args.download_dir}")
 
 
 if __name__ == "__main__":
