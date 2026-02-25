@@ -357,6 +357,44 @@ TASK_SUITE=libero_distractor ./pi_setting/eval/eval_libero_quick_test.sh
 
 ---
 
+### Example 2: Create Suite with Scene Variants
+
+For creating multiple scene layouts with different object positions (same task command):
+
+```bash
+# 1. Edit generate_scene_variants.sh:
+#    CREATE_NEW_SUITE=true
+#    NEW_SUITE_NAME="libero_object_variants"
+#    SOURCE_SUITE="libero_object"
+
+# 2. Generate variants (suite is automatically registered!)
+bash scripts/generate_scene_variants.sh
+
+# 3. Validate
+bash scripts/validate_libero_suite.sh libero_object_variants
+
+# 4. Test
+TASK_SUITE=libero_object_variants ./pi_setting/eval/eval_libero_quick_test.sh
+```
+
+**Note:** Suite is automatically registered in LIBERO - no manual registration needed!
+
+**See [SCENE_VARIANTS_GUIDE.md](SCENE_VARIANTS_GUIDE.md) for detailed documentation.**
+
+---
+
+## Tool Comparison
+
+| Tool | Purpose | Use Case |
+|------|---------|----------|
+| `create_new_libero_suite.sh` | Create suite with BDDL changes | Adding/removing objects, changing task definitions |
+| `generate_scene_variants.sh` | Create suite with position swaps | Multiple scene layouts, same task command |
+| `set_liberoenv_addobject.sh` | Regenerate single task | Iterative BDDL editing |
+| `regenerate_all_tasks.py` | Bulk regenerate init files | After multiple BDDL edits |
+| `validate_libero_suite.sh` | Verify suite setup | Pre-evaluation checks |
+
+---
+
 ### Example 2: Iterate on Single Task
 
 ```bash
