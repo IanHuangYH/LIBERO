@@ -19,7 +19,7 @@ This guide explains how to create and manage custom LIBERO task suites (e.g., va
 
 ```bash
 # Step 1: Create suite from existing one
-python third_party/LIBERO/scripts/create_new_libero_suite.py \
+bash third_party/LIBERO/scripts/create_new_libero_suite.sh \
     --new_suite libero_unseen_object \
     --copy_from libero_object \
     --description "LIBERO Object tasks with unseen distractor objects"
@@ -28,12 +28,16 @@ python third_party/LIBERO/scripts/create_new_libero_suite.py \
 # Edit files in: third_party/LIBERO/libero/libero/bddl_files/libero_unseen_object/
 
 # Step 3: Regenerate init files after editing BDDLs
+bash third_party/LIBERO/scripts/create_new_libero_suite.sh \
+    --new_suite libero_unseen_object \
+    --regenerate_init_only
+
+# Alternatively, use the Python script directly:
 python third_party/LIBERO/scripts/regenerate_all_tasks.py \
     --suite libero_unseen_object
 
 # Step 4: Validate setup
-python third_party/LIBERO/scripts/validate_libero_suite.py \
-    --suite libero_unseen_object
+bash third_party/LIBERO/scripts/validate_libero_suite.sh libero_unseen_object
 
 # Step 5: Test evaluation
 TASK_SUITE=libero_unseen_object ./pi_setting/eval/eval_libero_quick_test.sh
@@ -77,20 +81,20 @@ TASK_SUITE=libero_unseen_object ./pi_setting/eval/eval_libero_quick_test.sh
 
 ## Tool Reference
 
-### 1. `create_new_libero_suite.py`
+### 1. `create_new_libero_suite.sh` (Recommended)
 
-**Purpose:** Automate suite creation and registration
+**Purpose:** Shell wrapper for automated suite creation and registration
 
 **Usage:**
 ```bash
 # Create new suite
-python third_party/LIBERO/scripts/create_new_libero_suite.py \
+bash third_party/LIBERO/scripts/create_new_libero_suite.sh \
     --new_suite libero_custom \
     --copy_from libero_object \
     --description "My custom LIBERO suite"
 
 # Regenerate init files for existing suite
-python third_party/LIBERO/scripts/create_new_libero_suite.py \
+bash third_party/LIBERO/scripts/create_new_libero_suite.sh \
     --new_suite libero_custom \
     --regenerate_init_only
 ```
@@ -98,9 +102,12 @@ python third_party/LIBERO/scripts/create_new_libero_suite.py \
 **What it does:**
 - ✅ Creates `bddl_files/<suite_name>/` and `init_files/<suite_name>/`
 - ✅ Copies all BDDL and init files from source suite
+- ✅ Creates `.bddl.old` backup files automatically
 - ✅ Adds suite to `libero_suite_task_map.py`
 - ✅ Registers suite class in `benchmark/__init__.py`
 - ✅ Adds suite to `libero_suites` list
+
+**Python version:** `create_new_libero_suite.py` - Same functionality, called by the shell script
 
 **Arguments:**
 - `--new_suite`: Name of the new suite (required)
@@ -166,24 +173,26 @@ python third_party/LIBERO/scripts/regenerate_all_tasks.py \
 
 ---
 
-### 4. `validate_libero_suite.py`
+### 4. `validate_libero_suite.sh` (Recommended)
 
-**Purpose:** Validate that suite is properly configured
+**Purpose:** Shell wrapper for validating suite configuration
 
 **Usage:**
 ```bash
-python third_party/LIBERO/scripts/validate_libero_suite.py \
-    --suite libero_unseen_object
+bash third_party/LIBERO/scripts/validate_libero_suite.sh libero_unseen_object
 ```
 
 **What it checks:**
 - ✅ Directories exist (`bddl_files/`, `init_files/`)
 - ✅ All tasks have BDDL files
 - ✅ All tasks have `.init` and `.pruned_init` files
+- ✅ All tasks have `.bddl.old` backup files
 - ✅ Suite is in `libero_suite_task_map.py`
 - ✅ Suite is in `libero_suites` list
 - ✅ Benchmark class exists
 - ✅ Suite can be imported and instantiated
+
+**Python version:** `validate_libero_suite.py --suite <name>` - Same functionality, called by the shell script
 
 **When to use:**
 - Before running evaluation
@@ -325,7 +334,7 @@ python scripts/regenerate_all_tasks.py --suite <name>
 
 ```bash
 # 1. Create suite
-python scripts/create_new_libero_suite.py \
+bash scripts/create_new_libero_suite.sh \
     --new_suite libero_distractor \
     --copy_from libero_object \
     --description "Object tasks with visual distractors"
@@ -335,10 +344,12 @@ python scripts/create_new_libero_suite.py \
 # Add: plate, bowl, mug (as distractors)
 
 # 3. Regenerate init files
-python scripts/regenerate_all_tasks.py --suite libero_distractor
+bash scripts/create_new_libero_suite.sh \
+    --new_suite libero_distractor \
+    --regenerate_init_only
 
 # 4. Validate
-python scripts/validate_libero_suite.py --suite libero_distractor
+bash scripts/validate_libero_suite.sh libero_distractor
 
 # 5. Test
 TASK_SUITE=libero_distractor ./pi_setting/eval/eval_libero_quick_test.sh
@@ -367,7 +378,7 @@ vim bddl_files/libero_distractor/pick_up_the_milk_and_place_it_in_the_basket.bdd
 
 ```bash
 # Create suite based on spatial tasks
-python scripts/create_new_libero_suite.py \
+bash scripts/create_new_libero_suite.sh \
     --new_suite libero_spatial_variant \
     --copy_from libero_spatial \
     --description "Spatial tasks with different arrangements"
@@ -411,7 +422,9 @@ third_party/LIBERO/libero/libero/
 
 1. **Always validate after changes**
    ```bash
-   python scripts/validate_libero_suite.py --suite <name>
+   bash scripts/validate_libero_suite.sh <name>
+   # Or use Python directly:
+   # python scripts/validate_libero_suite.py --suite <name>
    ```
 
 2. **Use version control**
@@ -449,10 +462,12 @@ third_party/LIBERO/libero/libero/
 
 Creating a custom LIBERO suite is now streamlined:
 
-1. **One command** to create and register: `create_new_libero_suite.py`
+1. **One command** to create and register: `create_new_libero_suite.sh`
 2. **Manual BDDL editing** (the creative part)
-3. **One command** to regenerate all: `regenerate_all_tasks.py`
-4. **One command** to validate: `validate_libero_suite.py`
+3. **One command** to regenerate all: `create_new_libero_suite.sh --regenerate_init_only`
+4. **One command** to validate: `validate_libero_suite.sh`
 5. **Ready to evaluate!**
+
+Shell wrappers (`.sh`) provide easier usage. For advanced options, use the Python scripts directly.
 
 For questions or issues, check the validation output first—it provides specific guidance on what's missing or misconfigured.

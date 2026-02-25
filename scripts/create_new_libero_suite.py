@@ -276,12 +276,12 @@ def print_next_steps(suite_name, new_creation=True):
         print(f"\n1. Edit BDDL files in:")
         print(f"   {bddl_dir}")
         print(f"\n2. After editing, regenerate init files:")
-        print(f"   python third_party/LIBERO/scripts/create_new_libero_suite.py --new_suite {suite_name} --regenerate_init_only")
+        print(f"   bash third_party/LIBERO/scripts/create_new_libero_suite.sh --new_suite {suite_name} --regenerate_init_only")
         print(f"\n3. Or regenerate individual tasks:")
-        print(f"   ./third_party/LIBERO/scripts/set_liberoenv_addobject.sh {suite_name} <task_name>")
+        print(f"   bash third_party/LIBERO/scripts/set_liberoenv_addobject.sh {suite_name} <task_name>")
     
     print(f"\n4. Validate your suite:")
-    print(f"   python third_party/LIBERO/scripts/validate_libero_suite.py --suite {suite_name}")
+    print(f"   bash third_party/LIBERO/scripts/validate_libero_suite.sh {suite_name}")
     
     print(f"\n5. Test with evaluation:")
     print(f"   TASK_SUITE={suite_name} ./third_party/LIBERO/scripts/eval_libero_quick_test.sh")

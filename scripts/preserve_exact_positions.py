@@ -143,6 +143,7 @@ def visualize_init_states(
     init_states_path: str,
     output_dir: str,
     num_scenes: int = 1,
+    task_name: str = None,
 ):
     """
     Visualize initial states by rendering scenes.
@@ -152,6 +153,7 @@ def visualize_init_states(
         init_states_path: Path to init states file
         output_dir: Directory to save rendered images
         num_scenes: Number of scenes to render
+        task_name: Optional task name for unique filenames
     """
     print(f"\n{'='*80}")
     print("RENDERING INITIAL SCENES")
@@ -178,6 +180,12 @@ def visualize_init_states(
     num_to_render = min(num_scenes, len(init_states))
     print(f"\nRendering {num_to_render} scenes...")
     
+    # Generate filename prefix from task_name or default
+    if task_name:
+        file_prefix = f"{task_name}_scene"
+    else:
+        file_prefix = "scene"
+    
     # Settle objects after loading each state (matching LiberoEnv.reset() behavior)
     dummy_action = np.zeros(7)  # LIBERO uses 7-dim actions
     
@@ -195,7 +203,7 @@ def visualize_init_states(
         if agentview is not None:
             # Flip both dimensions for correct orientation
             agentview_flipped = agentview[::-1, ::-1]
-            img_path = output_path / f"scene_{i:03d}_agentview.png"
+            img_path = output_path / f"{file_prefix}_{i:03d}_agentview.png"
             # Convert RGB to BGR for cv2
             cv2.imwrite(str(img_path), cv2.cvtColor(agentview_flipped, cv2.COLOR_RGB2BGR))
             print(f"  ✓ Saved: {img_path.name}")
@@ -203,7 +211,7 @@ def visualize_init_states(
         # Save eye-in-hand camera
         eye_in_hand = obs.get('robot0_eye_in_hand_image', None)
         if eye_in_hand is not None:
-            img_path = output_path / f"scene_{i:03d}_wrist.png"
+            img_path = output_path / f"{file_prefix}_{i:03d}_wrist.png"
             cv2.imwrite(str(img_path), cv2.cvtColor(eye_in_hand, cv2.COLOR_RGB2BGR))
     
     env.close()
@@ -569,10 +577,13 @@ def preserve_positions_add_objects(
     print("=" * 80)
     
     # Visualize the first few generated states
+    # Extract task name from BDDL path for unique filenames
+    task_name = Path(new_bddl_path).stem  # e.g., "pick_up_the_milk_and_place_it_in_the_basket"
     visualize_init_states(
         bddl_path=new_bddl_path,
         init_states_path=str(output_path),
         output_dir=str(output_path.parent / "visualizations"),
+        task_name=task_name,
     )
     
     return output_path
